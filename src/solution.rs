@@ -46,7 +46,7 @@ impl Solution for Solution0 {
             tokio::select! {
                 _ = interval.tick() => println!("Another 100ms"),
                 Some(bin) = ok_rx.recv() => {
-                    kill_tx.send(()).unwrap();
+                    let _ = kill_tx.send(());
                     for task in tasks {
                         let _ = task.await;
                     }
@@ -54,8 +54,8 @@ impl Solution for Solution0 {
                 },
                 Some(_) = err_rx.recv() => {
                     err_count += 1;
-                    if err_count == repo_len {
-                        kill_tx.send(()).unwrap();
+                    if err_count >= repo_len {
+                        let _ = kill_tx.send(());
                         for task in tasks {
                             let _ = task.await;
                         }
